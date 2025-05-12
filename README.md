@@ -1,5 +1,37 @@
 # zk-creds
 zk-creds(Nova)
+# zk-age-proof-demo
+
+This project demonstrates a **Zero-Knowledge age proof** using two different zkSNARK schemes: [Nova (incrementally verifiable SNARK) and Groth16 (traditional SNARK)]. The goal is to compare their performance in an "age proof" scenario where a user proves they are above a certain age threshold without revealing their birth year.
+
+## Overview
+
+- **Nova scheme:** Uses the Nova recursive SNARK (via `nova-snark = 0.41.0`) on the Pasta curves (Pallas/Vesta) to allow incremental proof updates (append new proofs) and a final proof compression. We implement a StepCircuit that checks a Poseidon hash commitment of the birth year and verifies `current_year - birth_year ≥ threshold`. Multiple steps can be appended recursively before producing one small proof.
+- **Groth16 scheme:** Uses the Groth16 SNARK (via `bellman = 0.14` on BLS12-381) to prove the same statement in a single shot. We implement a circuit with the same logic (Poseidon hash + age inequality) and perform a traditional trusted setup and proof generation.
+
+Both schemes use a **Poseidon hash** commitment for the birth year, implemented using the `neptune` crate for consistency between native and circuit computations. The Poseidon hash ensures the birth year remains secret while allowing verification of age.
+
+## Dependencies
+
+- Rust **stable** (edition 2021)
+- **Nova SNARK** crate = **0.41.0** (Nova recursive proof framework)
+- **Bellman** = **0.14** (Groth16 SNARK implementation)
+- **bls12_381** = **0.4** (BLS12-381 pairing-friendly curve types)
+- **neptune** = **13.0** (Poseidon hash implementation)
+- **pasta_curves** = **0.5** (Pallas and Vesta elliptic curves for Nova)
+- **clap** = **4.x** (for CLI interface)
+- **serde + serde_json** = **1.0** (for JSON state/proof storage)
+- **rand** = **0.8** (for randomness in Groth16)
+- **hex, base64** for encoding/decoding in proofs
+
+All exact versions are specified in `Cargo.toml` for reproducibility.
+
+## Build and Run
+
+Make sure you have Rust installed. Build the project with:
+
+```bash
+cargo build --release
 
 
 
